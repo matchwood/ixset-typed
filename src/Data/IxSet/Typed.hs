@@ -186,7 +186,11 @@ module Data.IxSet.Typed
      flattenWithCalcs,
 
      -- * Debugging and optimization
-     stats
+     stats,
+
+     -- * additional utility funcs
+
+     ixSetIdxsListToList
 )
 where
 
@@ -194,7 +198,7 @@ import Prelude hiding (null)
 
 import           Control.Arrow  (first, second)
 import           Control.DeepSeq
-import           Data.Foldable  (Foldable)
+-- import           Data.Foldable  (Foldable)
 import qualified Data.Foldable  as Fold
 import           Data.Generics  (Data, gmapQ)
 -- import qualified Data.Generics.SYB.WithClass.Basics as SYBWC
@@ -204,7 +208,7 @@ import qualified Data.List      as List
 import           Data.Map       (Map)
 import qualified Data.Map       as Map
 import           Data.Maybe     (fromMaybe)
-import           Data.Monoid    (Monoid(mempty, mappend))
+-- import           Data.Monoid    (Monoid(mempty, mappend))
 import           Data.SafeCopy  (SafeCopy(..), contain, safeGet, safePut)
 import           Data.Set       (Set)
 import qualified Data.Set       as Set
@@ -336,6 +340,7 @@ lengthIxList = go 0
     go :: forall ixs'. Int -> IxList ixs' a -> Int
     go !acc Nil        = acc
     go !acc (_ ::: xs) = go (acc + 1) xs
+
 
 -- | Turn an index list into a normal list, given a function that
 -- turns an arbitrary index into an element of a fixed type @r@.
@@ -1034,3 +1039,10 @@ stats (IxSet a ixs) = (no_elements,no_indexes,no_keys,no_values)
       no_indexes  = lengthIxList ixs
       no_keys     = sum (ixListToList (\ (Ix m _) -> Map.size m) ixs)
       no_values   = sum (ixListToList (\ (Ix m _) -> sum [Set.size s | s <- Map.elems m]) ixs)
+
+ixSetIdxsListToList :: (All Ord ixs, Indexable ixs a) =>
+                                IxSet ixs a
+                             -> (forall ix. Ord ix => Ix ix a -> r)
+                             -> [r]
+ixSetIdxsListToList (IxSet _ ixs) f = ixListToList f ixs
+
