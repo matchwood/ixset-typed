@@ -190,7 +190,8 @@ module Data.IxSet.Typed
 
      -- * additional utility funcs
 
-     ixSetIdxsListToList
+     ixSetIdxsListToList,
+     ixSetIdxs
 )
 where
 
@@ -1046,3 +1047,7 @@ ixSetIdxsListToList :: (All Ord ixs, Indexable ixs a) =>
                              -> [r]
 ixSetIdxsListToList (IxSet _ ixs) f = ixListToList f ixs
 
+ixSetIdxs :: (IsIndexOf ix ixs) => Indexable ixs a => IxSet ixs a -> [ix]
+ixSetIdxs (IxSet _ ixs) =
+  let (Ix m _) = access ixs
+  in Map.keys m
