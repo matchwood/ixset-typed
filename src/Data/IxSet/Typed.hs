@@ -180,6 +180,7 @@ module Data.IxSet.Typed
      groupBy,
      groupAscBy,
      groupDescBy,
+     indexKeys,
 
      -- * Index creation helpers
      flatten,
@@ -211,6 +212,7 @@ import qualified Data.Map       as Map
 import           Data.Maybe     (fromMaybe)
 -- import           Data.Monoid    (Monoid(mempty, mappend))
 import           Data.SafeCopy  (SafeCopy(..), contain, safeGet, safePut)
+import           Data.Semigroup (Semigroup(..))
 import           Data.Set       (Set)
 import qualified Data.Set       as Set
 import           Data.Typeable  (Typeable, cast {- , typeOf -})
@@ -407,6 +409,9 @@ instance (All NFData ixs, NFData a) => NFData (IxList ixs a) where
 
 instance (All NFData ixs, NFData a) => NFData (IxSet ixs a) where
   rnf (IxSet a ixs) = rnf a `seq` rnf ixs
+
+instance Indexable ixs a => Semigroup (IxSet ixs a) where
+  (<>) = mappend
 
 instance Indexable ixs a => Monoid (IxSet ixs a) where
   mempty  = empty
@@ -947,6 +952,13 @@ groupBy (IxSet _ indexes) = f (access indexes)
   where
     f :: Ix ix a -> [(ix, [a])]
     f (Ix index _) = map (second Set.toList) (Map.toList index)
+
+-- | Returns the list of index keys being used for a particular index.
+indexKeys :: forall ix ixs a . IsIndexOf ix ixs => IxSet ixs a -> [ix]
+indexKeys (IxSet _ indexes) = f (access indexes)
+  where
+    f :: Ix ix a -> [ix]
+    f (Ix index _) = Map.keys index
 
 -- | Returns lists of elements paired with the indices determined by
 -- type inference.
