@@ -111,15 +111,15 @@ and 'empty' to build up an 'IxSet' collection:
 module Data.IxSet.Typed
     (
      -- * Set type
-     IxSet(),
-     IxList(),
+     IxSet(..),
+     IxList(..),
      Indexable(..),
      IsIndexOf(),
      All,
      -- ** Declaring indices
-     Ix(),
+     Ix(..),
      ixList,
-     MkIxList(),
+     MkIxList(..),
      ixFun,
      ixGen,
      -- ** TH derivation of indices
