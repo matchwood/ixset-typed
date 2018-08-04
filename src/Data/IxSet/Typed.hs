@@ -114,7 +114,7 @@ module Data.IxSet.Typed
      IxSet(..),
      IxList(..),
      Indexable(..),
-     IsIndexOf(),
+     IsIndexOf(..),
      All,
      -- ** Declaring indices
      Ix(..),
